@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="九州 8 天 7 夜家族自駕行程分享與方案投票網頁，2026 年 6 月 16 日至 23 日，6 人包車深度遊。">
+    <title>九州 8 天 7 夜行程方案詳細對比與討論</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #06b6d4;
+            --option-bg: rgba(255, 255, 255, 0.02);
+            --option-active-bg: rgba(79, 70, 229, 0.15);
+            --option-active-border: rgba(129, 140, 248, 0.4);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 12px;
+            overflow-x: hidden;
+        }
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 20px; }
+        header {
+            text-align: center;
+            padding: 24px 16px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.2);
+        }
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #a5b4fc, #818cf8, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        header p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+        .notice-box {
+            background: rgba(6,182,212,0.08);
+            border: 1px solid rgba(6,182,212,0.2);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 0.8rem;
+            color: #cffafe;
+            text-align: left;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+        .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            padding: 10px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            font-family: inherit;
+        }
+        .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary-light); box-shadow: 0 0 15px rgba(79,70,229,0.4); }
+        .tab-btn.has-choice::after { content: " \25CF"; color: var(--accent); font-size: 0.7rem; }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 24px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            gap: 22px;
+            animation: fadeIn 0.4s cubic-bezier(0.4,0,0.2,1) forwards;
+        }
+        .card.active { display: flex; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+        .card-header {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 14px;
+        }
+        .card-day-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-day-label {
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 9px;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+        .card-date-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.4;
+        }
+        .card-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255,255,255,0.06);
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.73rem;
+            font-weight: 600;
+            align-self: flex-start;
+        }
+        .timeline { display: flex; flex-direction: column; gap: 18px; }
+        .timeline-item { display: flex; gap: 14px; }
+        .time-marker { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+        .marker-dot { width: 11px; height: 11px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 8px var(--accent); margin-top: 4px; }
+        .marker-line { width: 2px; flex-grow: 1; background: rgba(255,255,255,0.08); margin-top: 5px; }
+        .timeline-item:last-child .marker-line { display: none; }
+        .time-content { flex: 1; padding-bottom: 4px; }
+        .time-tag {
+            font-size: 0.75rem;
+            color: var(--accent);
+            font-weight: 700;
+            background: rgba(6,182,212,0.1);
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            letter-spacing: 0.3px;
+        }
+        .time-title { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 5px; margin-top: 3px; }
+        .time-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.65; }
+        .decision-section {
+            background: rgba(79,70,229,0.08);
+            border: 1px solid rgba(129,140,248,0.2);
+            border-radius: 20px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .decision-header { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; }
+        .decision-header h3 { font-size: 0.95rem; font-weight: 700; color: var(--primary-light); }
+        .decision-badge { background: var(--accent); color: #0f172a; font-size: 0.65rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        .option-card {
+            background: var(--option-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .option-card:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.15); }
+        .option-card.selected { background: var(--option-active-bg); border-color: var(--option-active-border); box-shadow: 0 4px 15px rgba(79,70,229,0.15); }
+        .option-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+        .option-name { font-weight: 700; font-size: 0.95rem; color: #fff; flex: 1; line-height: 1.4; }
+        .option-card.selected .option-name { color: var(--primary-light); }
+        .vote-indicator {
+            width: 18px; height: 18px;
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .option-card.selected .vote-indicator { border-color: var(--primary-light); background: var(--primary); }
+        .option-card.selected .vote-indicator::after { content: ""; width: 8px; height: 8px; background: #fff; border-radius: 50%; }
+        .option-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 8px; }
+        .option-details-list { margin-top: 8px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 8px; }
+        .detail-item { font-size: 0.82rem; line-height: 1.55; }
+        .detail-label { color: var(--accent); font-weight: 700; margin-right: 3px; }
+        .detail-val { color: var(--text-main); }
+        .option-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+        .meta-item { background: rgba(255,255,255,0.05); padding: 3px 9px; border-radius: 6px; color: var(--text-muted); font-size: 0.72rem; }
+        .option-card.selected .meta-item { background: rgba(129,140,248,0.15); color: var(--primary-light); }
+        .info-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .info-icon { color: var(--primary-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .info-details { display: flex; flex-direction: column; gap: 2px; }
+        .info-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
+        .info-name { font-size: 0.85rem; font-weight: 700; color: #fff; line-height: 1.5; }
+        .nav-buttons { display: flex; justify-content: space-between; gap: 12px; }
+        .nav-btn {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 14px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-family: inherit;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>九州 8 天 7 夜行程討論網頁</h1>
+        <p>2026/06/16 - 2026/06/23 | 6 人家族自駕行</p>
+        <div class="notice-box">
+            提示：標示「&#9679;」的日期（D1、D4、D5、D6）有不同方案可選。請詳細閱讀每個方案的時程與分析，點擊您支持的方案，截圖發到群組討論！
+        </div>
+    </header>
+    <div class="tabs" id="tabContainer"></div>
+    <div id="cardContainer"></div>
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="prevDay()">&#9664; 上一日</button>
+        <button class="nav-btn" onclick="nextDay()">下一日 &#9654;</button>
+    </div>
+</div>
+
+<script>
+var itinerary = [
+    {
+        day: 1,
+        date: "6/16 (二)",
+        title: "啟程福岡 > 別府溫泉",
+        route: "福岡機場 > 別府",
+        events: [
+            {
+                time: "06:45",
+                title: "虎航 IT240 起飛",
+                desc: "台北桃園 (TPE) 起飛，10:05 抵達福岡機場 (FUK)。預訂代號：O8CBPJ。"
+            },
+            {
+                time: "10:05",
+                title: "抵達福岡機場",
+                desc: "班機降落國際航廈，辦理出關，搭接駁車至 Sky 租車店鋪。"
+            },
+            {
+                time: "10:45-11:30",
+                title: "辦理租車",
+                desc: "Sky Rent-A-Car 福岡空港店辦理取車手續，加購 KEP 優惠通行券。電話：092-623-5222。預訂代碼：SK260529-2053。已含「免責補償」及「安心補償 W 方案」，無自負額。租用 WA 級 Wagon 廂型車，至 6/21 20:00 PM。"
+            },
+            {
+                time: "12:15-13:00",
+                title: "山田 SA（下行）特色午餐",
+                desc: "大分自動車道上人氣最高的大型服務區。必吃特色：綠能朝倉地雞飯、耳納高原豬排丼，或是現烤巨無霸咖哩麵包與當地限定朝倉萬年蜜牛奶霜淇淋。"
+            }
+        ],
+        decisions: [
+            {
+                id: "d1-route",
+                title: "D1 景點動線抉擇：是否順遊由布院",
+                options: [
+                    {
+                        id: "d1-a",
+                        name: "方案 A：順遊由布院溫泉小鎮",
+                        desc: "SA 午餐後前往日本極受歡迎的溫泉小鎮「由布院」（約 1 小時車程）。漫步金鱗湖、逛湯之坪街道、吃 Milch 起司蛋糕或 B-Speak 蛋糕捲，再驅車 45 分鐘前往別府，沿途可停「狹霧台展望台」俯瞰由布院山谷。",
+                        meta: ["行車：福岡 > 由布院 (1 小時) > 別府 (45 分鐘)", "下午節奏：充實逛街", "多一個精品溫泉小鎮景點"],
+                        details: [
+                            { label: "詳細時程", val: "13:00-14:00 自駕至由布院 > 14:00-15:30 漫步金鱗湖、湯之坪街道 > 15:30-16:15 自駕前往別府（途經狹霧台）> 16:15-17:15 明礬湯之里 + 岡本屋布丁 > 17:30-18:30 別府世界之塔（黃金魔幻時刻）> 18:45 後龜正壽司排隊 > 20:15 後 Check-in 飯店" },
+                            { label: "金鱗湖與湯之坪街道", val: "全天開放 | 地址：大分県由布市湯布院町川上" },
+                            { label: "別府世界之塔", val: "Mapcode: 46 523 056*25 | 營業時間：09:00 - 21:00 | 地址：大分県別府市山の手町 12-1" },
+                            { label: "岡本屋売店", val: "Mapcode: 46 484 849*44 | 營業時間：08:30 - 18:30 | 地址：大分県別府市明礬 3 組" },
+                            { label: "龜正壽司", val: "Mapcode: 46 488 166*52 | 大型免費停車場 | 11:00 起，售罄為止（現場抽號碼牌）| 地址：大分県別府市北中 791-8 | 電話：0977-66-5225" }
+                        ]
+                    },
+                    {
+                        id: "d1-b",
+                        name: "方案 B：直奔別府 黃金路線",
+                        desc: "SA 午餐後一路向下直奔別府明礬溫泉，行程更從容。下午有充裕時間參觀湯之花小屋、吃地獄蒸布丁、登上世界之塔賞黃昏灣景，17:35 提早抵達龜正壽司，排到隊的機率高達 90% 以上。",
+                        meta: ["行車：約 2 小時直達別府", "下午節奏：悠閒充裕", "龜正壽司排到機率最高"],
+                        details: [
+                            { label: "詳細時程", val: "13:00-14:15 自駕直奔別府明礬溫泉 > 14:15-15:15 明礬湯之里 + 岡本屋布丁 > 15:30-16:00 湯霧展望台俯瞰鐵輪溫泉白煙 > 16:20-17:20 別府世界之塔 360 度賞灣景 > 17:35 提早抵達龜正壽司抽號碼牌 > 19:15 後 Check-in 飯店享露天溫泉" },
+                            { label: "湯霧展望台", val: "俯瞰鐵輪溫泉街裊裊溫泉白煙，日本重要文化景觀" },
+                            { label: "別府世界之塔", val: "Mapcode: 46 523 056*25 | 營業時間：09:00 - 21:00 | 地址：大分県別府市山の手町 12-1" },
+                            { label: "岡本屋売店", val: "Mapcode: 46 484 849*44 | 營業時間：08:30 - 18:30 | 地址：大分県別府市明礬 3 組" },
+                            { label: "龜正壽司", val: "Mapcode: 46 488 166*52 | 大型免費停車場 | 售罄為止（建議 17:35 前抵達）| 地址：大分県別府市北中 791-8 | 電話：0977-66-5225" },
+                            { label: "備案：壽司大臣別府店", val: "Mapcode: 46 457 416*25 | 11:00-21:30 | 距龜正 6 分鐘車程 | 電話：0977-67-1515（若龜正售罄立刻前往）" }
+                        ]
+                    }
+                ]
+            }
+        ],
+        lodging: "別府新鶴田飯店 | 地址：大分県別府市北浜 1-14-15 | 電話：0977-22-1110 | 備註：先到先得付費車位 700 日圓/晚，6 樓有別府灣景露天溫泉"
+    },
+    {
+        day: 2,
+        date: "6/17 (三)",
+        title: "山脈公路 > 鍋瀑布 > 黑川 > 大觀峰 > 阿蘇烤肉",
+        route: "別府 > 長者原 > 鍋瀑布 > 黑川 > 大觀峰 > 阿蘇",
+        events: [
+            {
+                time: "09:00-09:30",
+                title: "別府新鶴田飯店退房出發",
+                desc: "行李放上車，迎著晨光開啟阿蘇高原自駕之旅。"
+            },
+            {
+                time: "09:30-11:15",
+                title: "山脈公路（Yamanami Highway）> 長者原中停",
+                desc: "沿全日本最美高原自駕公路「縣道 11 號」前行。於【長者原】停靠，以筆直公路直通巨大火山為背景拍下經典自駕合照，散步蓼原濕地木棧道欣賞九重山景緻。"
+            },
+            {
+                time: "11:40-12:20",
+                title: "鍋瀑布公園（已預約）",
+                desc: "預約時段：11:40 - 12:20。走到瀑布「背面」，從飛瀑內側看著陽光穿透森林，宛若精靈仙境。必須提前於官網線上預訂門票。Mapcode: 340 597 186*38 | 備有專用免費停車場 | 地址：熊本県阿蘇郡南小国町黒川。"
+            },
+            {
+                time: "13:00-16:00",
+                title: "黑川溫泉街深度慢活",
+                desc: "13:00-14:00 在老街【味処 なかはら】享用地雞飯定食午餐。14:00-14:30 前往甜點名店【山のいぶき】品嚐 Jersey 特濃冷牛乳、大吟釀優格與焦糖溫泉布丁。14:30-16:00 前往「やまびこ旅館」享受巨石露天風呂或「新明館」洞窟溫泉（日歸泡湯 1.5 小時）。地址：熊本県阿蘇郡南小国町満願寺黑川 6567 | 電話：0967-44-0022。"
+            },
+            {
+                time: "16:00-17:00",
+                title: "牛奶之路（Milk Road）> 大觀峰黃昏",
+                desc: "接上遼闊牛奶之路，約 16:30 抵達阿蘇外輪山頂點【大觀峰】，欣賞落日餘暉灑在金色大草原與阿蘇火山口盆地的震撼全景。"
+            },
+            {
+                time: "17:00-17:45",
+                title: "みやはら超市 一之宮店 狂風採購",
+                desc: "從大觀峰下山直奔超市，採購頂級熊本黑毛和牛、阿蘇地雞、野菜、烤肉醬與泡沫啤酒。Mapcode: 256 642 374*71 | 地址：熊本県阿蘇市一の宮町宮地 2285-1 | 電話：0967-22-0055 | 09:00 - 20:00（無休）。備有大型免費停車場。"
+            }
+        ],
+        lodging: "あsono 紅葉別墅 | Mapcode: 256 674 213*56 | 地址：熊本県阿蘇市一宮町宮地 2392-16 | 電話：090-3343-4712 | 備註：免費車位 2 個，密碼鎖自助 Check-in 包棟別墅。司機在此封車大喝冰啤酒！"
+    },
+    {
+        day: 3,
+        date: "6/18 (四)",
+        title: "草千里 > 阿蘇火山 > 高千穗峽划船 > 神社",
+        route: "阿蘇 > 草千里 > 高千穗",
+        events: [
+            {
+                time: "08:30-09:00",
+                title: "あsono 紅葉別墅退房出發",
+                desc: "辦理退房，行李上車，開車前往阿蘇中岳火山高原區。"
+            },
+            {
+                time: "09:15-11:15",
+                title: "草千里之濱 + 阿蘇火山博物館",
+                desc: "抵達廣闊草原【草千里】，在草原散步、與放牧牛馬合照。隨後參觀【阿蘇火山博物館】感受大自然壯闊。Mapcode: 256 041 127*44 | 地址：熊本県阿蘇市赤水 1930-1 | 09:00 - 17:00（無休）。"
+            },
+            {
+                time: "11:15-12:15",
+                title: "阿蘇下山 > 快速午餐",
+                desc: "11:15 準時上車下山，中途在順路小餐館快速享用午餐（烏龍麵、便當或赤牛丼），把時間留給後段路程。"
+            },
+            {
+                time: "12:15-14:00",
+                title: "自駕前往高千穗峽（車程約 1.5 小時）",
+                desc: "沿國道 265 / 325 號往東南行駛，山路平緩好開，預計 14:00 抵達高千穗峽谷。"
+            },
+            {
+                time: "14:00-15:00",
+                title: "提早抵達 > 高千穗峽乘船處報到",
+                desc: "卡位御塩井付費停車場（500 日圓/次），沿石階步行下谷底報到。今日關鍵 45 分鐘安全緩衝，務必於 14:15 前完成報到繳費。Mapcode: 330 711 513*14 | 地址：宮崎県西臼杵郡高千穂町向山。"
+            },
+            {
+                time: "15:00-15:30",
+                title: "高千穗峽划船（已鎖定）",
+                desc: "已確認 15:00 預約！手划船穿行高聳玄武岩峭壁，近距離仰看「真名井瀑布」飛瀉而下。"
+            },
+            {
+                time: "15:30-16:30",
+                title: "峽谷步道散策",
+                desc: "沿高千穗峽鋪設良好的觀景步道散步，從上方俯瞰剛划船的溪谷與三座不同年代的拱橋。"
+            },
+            {
+                time: "16:45-17:30",
+                title: "高千穗神社社務所（御朱印時間壓線！）",
+                desc: "御朱印與御守賣店（社務所）營業時間：08:00 - 17:00。停好車請立刻先奔往社務所，完成後再安心參拜。若來不及，明日 D4 清晨 08:00 可補辦。Mapcode: 330 711 659*47 | 地址：宮崎県西臼杵郡高千穂町大字三田井 1037 | 備有免費專屬停車場。"
+            },
+            {
+                time: "17:30-18:15",
+                title: "A-Coop 高千穗店 採買（極重要！）",
+                desc: "今晚民宿周邊完全無超商與餐廳，務必在此買齊晚餐熟食、飲料與零食！Mapcode: 330 741 200*52 | 地址：宮崎県西臼杵郡高千穂町三田井 109-1 | 電話：0982-72-3343 | 09:30 - 19:00 | 備有免費停車場。"
+            }
+        ],
+        lodging: "高千穗岩戶民宿 | Mapcode: 32.731877, 131.347561 | 地址：宮崎県西臼杵郡高千穂町岩戶 | 備註：自助 Check-in。周邊完全無便利商店，請提前在 A-Coop 買齊一切。"
+    },
+    {
+        day: 4,
+        date: "6/19 (五)",
+        title: "天岩戶 > 天安河原 > 赤牛丼 > 上色見神社 > 白川水源",
+        route: "高千穗 > 高森 > 南阿蘇",
+        events: [
+            {
+                time: "08:00（備案啟用）",
+                title: "高千穗神社御朱印補收集",
+                desc: "僅在 D3 未能完成御朱印時啟用：清晨 08:00 返回高千穗神社送件，約 5-10 分鐘完成。社務所 08:00 開放。"
+            },
+            {
+                time: "09:00-10:15",
+                title: "天岩戶神社（西本殿）+ 天安河原",
+                desc: "參拜【天岩戶神社 西本殿】（授與所：08:30 - 17:00）。隨後沿溪谷步道步行約 10 分鐘抵達【天安河原】，置身滿地堆疊祈福石的巨大神祕石洞，感受強烈神話氣場。Mapcode: 330 744 195*11 | 地址：宮崎県西臼杵郡高千穂町岩戶 1073-1。"
+            },
+            {
+                time: "10:15-11:15",
+                title: "自駕：高千穗 > 阿蘇高森町（約 1 小時）",
+                desc: "沿國道 265 / 325 號往北，穿行火山外輪山之間，路面寬敞好開，風景極美。"
+            },
+            {
+                time: "11:00-15:00",
+                title: "あか牛料理専門店 やま康（赤牛丼午餐）",
+                desc: "11:15 抵達立刻登記名字，大口品嚐鋪滿半熟蛋與特製醬汁的「赤牛丼」。Mapcode: 256 182 711*82 | 地址：熊本県阿蘇郡高森町高森 3191 | 電話：0967-62-0051 | 11:00 - 15:00（售罄提早關門）。每週三、四公休，週五正常營業。備有大型專用免費停車場。"
+            },
+            {
+                time: "12:35-14:00",
+                title: "上色見熊野座神社（動漫螢火之森神域）",
+                desc: "兩側排列爬滿青苔的古老石燈籠，四周被高聳杉樹林環抱，光影宛如精靈世界（動漫《螢火之森》真實取景地）。步行至後方「穿戶岩」祈求好運。Mapcode: 256 125 141*52 | 地址：熊本県阿蘇郡高森町上色見 2619 | 入口旁免費停車場 | 全天開放。"
+            },
+            {
+                time: "14:15-15:45",
+                title: "白川水源（日本名水百選）",
+                desc: "湧水全天開放，可直接裝勺喝，口感甘甜沁涼。若今晚選方案 C 自炊，請用乾淨寶特瓶裝走幾瓶作為名水火鍋湯底！環境保全料辦公室：08:00 - 17:00。Mapcode: 256 037 414*41 | 地址：熊本県阿蘇郡南阿蘇村白川 2052。"
+            },
+            {
+                time: "16:00 以後",
+                title: "入住 ITO-STAY 南阿蘇",
+                desc: "辦理自助入住，洗衣、換便服、泡茶，在無敵落地窗前放空，享受包棟公寓的自在時光。"
+            }
+        ],
+        decisions: [
+            {
+                id: "d4-dinner",
+                title: "D4 晚餐風味抉擇（三種特色各有千秋）",
+                options: [
+                    {
+                        id: "d4-a",
+                        name: "方案 A：超人氣現烤放山雞 > 地雞炭火燒 らくだ山",
+                        desc: "圍坐在日式紅土炭火爐旁，用鐵網親自動手烤特製祕醬醃製的肥美放山地雞。外皮微焦、肉質極度 Q 彈、香氣四溢，豪爽的戶外野宴風格！強烈建議 17:30 前抵達以防地雞肉提早售罄。",
+                        meta: ["11:00 - 19:00 (L.O. 18:00)", "每週三公休，週五有營業", "強烈建議 17:30 前抵達", "每人約 2,000 - 2,500 日圓"],
+                        details: [
+                            { label: "特色魅力", val: "炭火煙燻香氣濃郁，土雞肉質極佳，體驗荒野大口吃肉的野性趣味，拍照效果極佳。" },
+                            { label: "注意事項", val: "烤火排煙較大，用餐後身上會有炭火烤肉味。公寓距此僅 12 分鐘車程。" },
+                            { label: "店家資訊", val: "Mapcode: 256 125 352*25 | 地址：熊本県阿蘇郡高森町高森 2693 | 電話：0967-62-0084" }
+                        ]
+                    },
+                    {
+                        id: "d4-b",
+                        name: "方案 B：200 年古民家圍爐裏燒烤 > 高森田樂之里",
+                        desc: "坐落在兩百年歷史茅草老屋中，圍坐在日式「圍爐裏」旁，將塗滿高森特產味噌的豆腐、溪流川魚與肥美和牛插在沙坑中慢火烘烤，極具日本神話鄉村儀式感。建議 18:00 前抵達入座。",
+                        meta: ["10:00 - 19:30 (L.O. 18:30)", "無固定公休", "百年古民家，氛圍優雅", "每人約 2,500 - 4,000 日圓"],
+                        details: [
+                            { label: "特色魅力", val: "精緻美味的烤溪魚與味噌豆腐，高森獨有的非物質文化體驗，視覺效果絕佳適合拍照。" },
+                            { label: "環境優勢", val: "古民家氛圍優雅，煙霧相對較少，適合家庭靜心用餐。公寓距此僅 10 分鐘車程。" },
+                            { label: "店家資訊", val: "Mapcode: 256 125 448*11 | 地址：熊本県阿蘇郡高森町高森 2685-2 | 電話：0967-62-1899" }
+                        ]
+                    },
+                    {
+                        id: "d4-c",
+                        name: "方案 C：極致慢活白川湧泉地雞火鍋 > 超市自炊",
+                        desc: "開車 5 分鐘到 A-Coop 南阿蘇店大採購，利用 ITO-STAY 無敵大廚房，用下午在白川水源裝的甘甜湧泉煮一鍋「白川名水地雞鍋」。全家穿著睡衣、一邊看阿蘇山景喝酒聚餐，最放鬆舒服！",
+                        meta: ["A-Coop：09:00 - 19:00（無休）", "每人僅約 1,000 - 1,500 日圓", "完全無時間限制", "ITO-STAY 大廚房設備完善"],
+                        details: [
+                            { label: "特色魅力", val: "利用名水百選白川湧泉做火鍋湯底，是全程最放鬆自在的一晚，最適合家族深夜聊天。" },
+                            { label: "超市資訊", val: "A-Coop 南阿蘇店 | Mapcode: 256 062 119*41 | 地址：熊本県阿蘇郡南阿蘇村中松 3790 | 電話：0967-62-9111" }
+                        ]
+                    }
+                ]
+            }
+        ],
+        lodging: "ITO-STAY 南阿蘇 | 地址：熊本県阿蘇郡南阿蘇村両併 425-1 | 備註：現代化設計公寓，自助入住，免費專屬車位請停指定 #103"
+    },
+    {
+        day: 5,
+        date: "6/20 (六)",
+        title: "雙自駕方案 > 熊本市區 > 下通商店街血拼",
+        route: "南阿蘇 > 熊本市區",
+        events: [
+            {
+                time: "08:30-09:00",
+                title: "ITO-STAY 南阿蘇 退房出發",
+                desc: "全家悠閒享用早餐後打包行李，08:30 至 09:00 之間行李上 Wagon 廂型車出發。"
+            },
+            {
+                time: "09:00-17:00",
+                title: "道の駅 あそ望の郷くぎの（ASO MILK 採購）",
+                desc: "阿蘇最強乳製品採購點，開門就進去避開人潮。買好極濃鮮乳與布丁，人手一支鮮乳霜淇淋，坐在戶外看傳統大水車與阿蘇五岳大景。Mapcode: 256 003 358*06 | 地址：熊本県阿蘇郡南阿蘇村久石 2807 | 電話：0967-67-3010 | 09:00 - 17:00（無休）。備有大型免費停車場。"
+            },
+            {
+                time: "10:52 通過",
+                title: "第一白川橋梁展望台（鐵道攝影）",
+                desc: "南阿蘇鐵道黃金攝影點。10:52 列車準時緩緩駛上紅色鋼骨大鐵橋，只需等待 7 分鐘即可拍下震撼大景。Mapcode: 256 121 213*44 | 地址：熊本県阿蘇郡南阿蘇村河陽（新阿蘇大橋旁觀景台）| 備有免費停車場。"
+            },
+            {
+                time: "11:30-21:30",
+                title: "勝烈亭 東バイパス保田窪店（熊本必吃炸豬排）",
+                desc: "大口享用外皮香酥、肉汁爆滿的「厚切黑豚里肌豬排定食」。自駕神店，座位寬敞，備超大型免費平面停車場。Mapcode: 29 555 491*10 | 地址：熊本県熊本市東区保田窪本町 1-3 | 電話：096-382-1215 | 11:30 - 21:30（無休）。"
+            },
+            {
+                time: "08:30-17:00",
+                title: "水前寺成趣園（日式庭園慢活）",
+                desc: "400 年歷史大名庭園，中央引阿蘇伏流水成池，漫步其中極具禪意。Mapcode: 29 462 847*88 | 地址：熊本県熊本市中央区水前寺公園 8-1 | 08:30 - 17:00（最後入園 16:30）。" },
+            {
+                time: "選配朝聖",
+                title: "魯夫雕像（ONE PIECE）分流攻略",
+                desc: "航海王首尊銅像位於熊本縣廳正門綠步道，距成趣園約 1 公里（步行 12-15 分鐘）。建議採「分流制」：悠閒組留在成趣園古今傳授之間喝抹茶吃和菓子，朝聖組步行前往打卡（來回 35-40 分鐘）。Mapcode: 29 491 627*52 | 地址：熊本県熊本市中央区水前寺 6-18-1。"
+            },
+            {
+                time: "09:00-19:00",
+                title: "櫻之馬場 城彩苑 江戶老街散策",
+                desc: "完全平坦無障礙石板路！散步 45 分鐘，必吃海膽可樂餅、馬肉可樂餅或陣太鼓抹茶霜淇淋。Mapcode: 29 489 313*88 | 地址：熊本県熊本市中央区二の丸 1-1-1 | 伴手禮店：09:00 - 19:00。"
+            },
+            {
+                time: "16:15-16:30",
+                title: "熊本華盛頓酒店 Check-in",
+                desc: "16:15 即可先 Check-in 封車，卸下大件行李。配合付費停車場（1,000 - 1,500 日圓/晚）。"
+            },
+            {
+                time: "16:30-19:30",
+                title: "下通商店街 藥妝最後大血拼（3 小時！）",
+                desc: "「封車」步行模式啟動！在大國藥妝、松本清、Bic Camera 瘋狂大採購。長者可在日式咖啡廳坐著喝茶休息。"
+            },
+            {
+                time: "19:30 以後",
+                title: "熊本屋台村 歡樂晚餐",
+                desc: "步行至熊本最新地標「熊本屋台村」，在暖色調燈籠與日式人情味的居酒屋享用燒肉、馬肉刺身，乾杯慶祝自駕最後一晚大成功！"
+            }
+        ],
+        decisions: [
+            {
+                id: "d5-morning",
+                title: "D5 上午行程抉擇：第一白川橋梁 10:52 前後景點安排",
+                options: [
+                    {
+                        id: "d5-a",
+                        name: "方案 1：鐵道攝影 + 立野水壩展望台 + ASO MILK（質感直線）",
+                        desc: "09:10 道の駅 ASO MILK 慢活 40 分鐘 > 09:50 驅車至立野站 > 10:10 步行 600m 至立野ダム展望台觀賞防洪大壩（25 分鐘）> 外帶 ニコニコ 黑糖饅頭 > 10:45 移車至橋梁展望台 > 10:52 等待 7 分鐘拍鐵道大景，完全不乾等！",
+                        meta: ["行程步調：舒適悠閒，免頻繁移車", "ASO MILK 40 分鐘 + 水壩步行 25 分鐘", "車停立野站（免費好停）"],
+                        details: [
+                            { label: "阿蘇立野ダム展望台", val: "由立野站步行約 10 分鐘 / 600m 抵達。居高臨下近距離觀賞極罕見的流水型防洪大壩與峽谷。Mapcode: 256 122 344*52（車停立野站前停車場）" },
+                            { label: "ニコニコ饅頭", val: "立野站前百年現蒸溫泉黑糖饅頭 | 08:00 起，售罄為止 | 地址：熊本県阿蘇郡南阿蘇村立野 1375" },
+                            { label: "優勢", val: "免去頻繁開車、移動與在窄路找停車位的負擔，行程極度從容，長者友善。" }
+                        ]
+                    },
+                    {
+                        id: "d5-b",
+                        name: "方案 2：高森 + Kugino + 俵山 全打包大滿貫",
+                        desc: "08:45 高森站打卡佛朗基銅像 > 09:15 高森湧水地道公園地底奇幻水世界（恆溫 17 度，6 月地道外開滿紫陽花）> 10:20 道の駅 ASO MILK > 11:05 俵山展望所 360 度大風車與盆地俯瞰 > 11:45 自駕下山前往熊本市區（50 分鐘）。",
+                        meta: ["景點多樣豐富，大滿貫體驗", "需多次開車移動", "方案二約 12:45 抵達勝烈亭"],
+                        details: [
+                            { label: "高森站（佛朗基銅像）", val: "南阿蘇鐵道終點站全新站體，朝聖《航海王》佛朗基巨型銅像合照（停留 25 分鐘）。備有免費停車場。" },
+                            { label: "高森湧水地道公園", val: "Mapcode: 256 153 381*85 | 長年恆溫 17 度，特殊頻閃水珠倒流奇景，6 月地道外盛開紫陽花（停留 50 分鐘）。" },
+                            { label: "俵山展望所", val: "與矗立山脊上的白色巨型風車合影，360 度俯瞰整個南阿蘇大盆地（停留 25 分鐘）。備有免費停車場。" }
+                        ]
+                    }
+                ]
+            }
+        ],
+        lodging: "熊本華盛頓酒店 | 地址：熊本市中央区下通 2-3-10 | 電話：096-322-8111 | 備註：配合付費停車場，16:15 即可先 Check-in 封車步行逛下通商店街"
+    },
+    {
+        day: 6,
+        date: "6/21 (日)",
+        title: "山鹿老街 > 博多安置行李 > 機場還車 > 牛腸鍋慶功",
+        route: "熊本 > 山鹿 > 博多 > 機場還車",
+        events: [
+            {
+                time: "08:30-09:30",
+                title: "熊本華盛頓酒店 早餐 + 退房",
+                desc: "悠閒享用早餐，辦理 Check-out，行李上車，啟程前往溫泉古鎮「山鹿市」。"
+            },
+            {
+                time: "09:00-17:00",
+                title: "八千代座（山鹿）開放參觀",
+                desc: "建於 1910 年的木造歌舞伎小劇場，為國家重要文化財。漫步老街，並在街邊「櫻湯（さくら湯）」享受免費足湯。Mapcode: 175 310 162*28 | 地址：熊本県山鹿市山鹿 1499 | 09:00 - 17:00（除公演日及週三公休外）。"
+            },
+            {
+                time: "16:30-17:00",
+                title: "博多祇園民宿 起降行李（全員先 Check-in）",
+                desc: "司機將車直接開往 Rakuten STAY 博多祇園門口，在一樓大廳使用自助平板輸入密碼完成 Check-in，行李搬進 401 號房。其他人不用再跟著去機場！Mapcode: 13 350 491*44 | 地址：福岡県福岡市博多区上五福町 12-31。"
+            },
+            {
+                time: "17:00-17:30",
+                title: "司機輕車出發 > ENEOS 加油站加滿油",
+                desc: "開往福岡機場附近 ENEOS 加油站，油箱加滿 Regular 汽油，保留加油滿油收據。"
+            },
+            {
+                time: "17:30-18:00",
+                title: "Sky 租車福岡機場店 還車 + 結清過路費",
+                desc: "辦理還車手續，現場結清 KEP 過路費。租期：6/16 11:00 AM 至 6/21 20:00 PM（共 6 天）。電話：092-623-5222。"
+            },
+            {
+                time: "18:15-18:45",
+                title: "接駁車 > 地鐵空港線 6 分鐘神速歸隊！",
+                desc: "坐免費接駁巴士至福岡機場國內線，搭地鐵空港線 3 站（約 6 分鐘）直達祇園站，步行 5 分鐘回到民宿 401 號房大 reunion！"
+            },
+            {
+                time: "18:45 以後",
+                title: "博多名物「牛腸鍋」慶功大派對",
+                desc: "全員輕裝步行前往祇園老街，在熱騰騰的博多名物「牛腸鍋」乾杯，慶祝自駕旅程大成功！"
+            }
+        ],
+        decisions: [
+            {
+                id: "d6-lunch",
+                title: "D6 午餐抉擇（山鹿地區）",
+                options: [
+                    {
+                        id: "d6-l1",
+                        name: "方案 A：彩座 (Saiza) > 櫻花馬肉重 / 阿蘇赤和牛重",
+                        desc: "山鹿溫泉老街名店，享用熊本名物「さくら重（櫻花馬肉重）」或「阿蘇赤和牛重」，滋味鮮美、視覺精緻。",
+                        meta: ["11:00 - 15:00", "週一公休（週日正常營業）"],
+                        details: [
+                            { label: "特色魅力", val: "體驗熊本最具代表性的馬肉料理，亦有一般牛豬肉定食可選，適合各口味。" },
+                            { label: "店家資訊", val: "Mapcode: 175 311 072*14 | 地址：熊本県山鹿市山鹿 1699 | 電話：0968-43-8555" }
+                        ]
+                    },
+                    {
+                        id: "d6-l2",
+                        name: "方案 B：お食事処 平野屋 > 現炊釜飯定食 + 蕎麥麵",
+                        desc: "深耕山鹿當地的溫馨老字號食堂，享用熱騰騰底部帶鍋巴的各式「現炊釜飯定食」與蕎麥麵，日本傳統家常口味，價格實惠飽足。",
+                        meta: ["11:30 - 14:30", "週三公休（週日正常營業）"],
+                        details: [
+                            { label: "特色魅力", val: "現點現炊的香濃釜飯，米飯底部微焦鍋巴極香，蕎麥麵滑順，是全家最無負擔的暖胃選擇。" },
+                            { label: "店家資訊", val: "Mapcode: 175 310 030*25 | 地址：熊本県山鹿市山鹿 1484-1 | 電話：0968-43-2200" }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "d6-afternoon",
+                title: "D6 下午行程抉擇（午餐後 13:30 出發）",
+                options: [
+                    {
+                        id: "d6-a",
+                        name: "方案 A：購物血拼 > 鳥栖 Premium Outlets（約 45 分鐘車程）",
+                        desc: "前往九州最大的鳥栖 Premium Outlets 大掃貨，150 家以上品牌，涵蓋國際名牌、運動潮流與日系服飾。大約 14:15 抵達，盡情血拼 2 小時 15 分鐘。",
+                        meta: ["10:00 - 20:00（無休）", "需於 6/21 20:00 PM 前還車", "車程順路"],
+                        details: [
+                            { label: "特色魅力", val: "品牌多元，折扣與免稅力道大，是整趟旅程中集中採購衣鞋包的最佳機會。" },
+                            { label: "時間軸", val: "13:30 出發 > 14:15 抵達 Outlets > 16:30 出發 > 17:15 抵達博多（先安置行李）> 17:30 司機出發還車" },
+                            { label: "景點資訊", val: "鳥栖 Premium Outlets | Mapcode: 37 854 532*77 | 地址：佐賀県鳥栖市弥生が丘 8-1" }
+                        ]
+                    },
+                    {
+                        id: "d6-b",
+                        name: "方案 B：慢活水鄉 > 柳川蒸籠鰻魚飯 + 手搖遊船（約 50 分鐘車程）",
+                        desc: "前往柳川享用名店若松屋百年「蒸籠烤鰻魚飯」，蒲燒鰻魚入口即化，帶竹葉與醬汁焦香。飯後乘坐傳統手搖櫓木舟，緩緩穿梭垂柳古橋的護城河道，聽船夫吟唱民謠（單程約 70 分鐘）。",
+                        meta: ["若松屋：11:00 - 19:30（週三、四公休）", "松月乘船場：09:00 - 17:00（無休）", "需於 6/21 20:00 PM 前還車"],
+                        details: [
+                            { label: "時間軸", val: "13:30 出發 > 12:30 抵達若松屋（約 14:00 前用餐）> 14:00 松月乘船場遊船 > 15:15 出發 > 16:15 抵達博多（先安置行李）> 17:00 司機出發還車" },
+                            { label: "若松屋", val: "Mapcode: 69 064 336*58 | 地址：福岡県柳川市沖端町 26 | 電話：0944-72-3163 | 週三、第四個週二公休（週日正常營業）" },
+                            { label: "松月乘船場", val: "Mapcode: 69 095 385*03 | 地址：福岡県柳川市三橋町高畑 329 | 隨到隨安排，單程約 70 分鐘" }
+                        ]
+                    }
+                ]
+            }
+        ],
+        lodging: "Rakuten STAY 博多祇園 | Mapcode: 13 350 491*44 | 地址：福岡県福岡市博多区上五福町 12-31 | 備註：16:30 門口臨時卸行李，房號 401，一樓自助平板 Check-in"
+    },
+    {
+        day: 7,
+        date: "6/22 (一)",
+        title: "太宰府天滿宮祈福 + 博多 / 天神最後大血拼",
+        route: "福岡市區 > 太宰府 > 博多（全天大眾運輸）",
+        events: [
+            {
+                time: "09:00-12:30",
+                title: "太宰府天滿宮 祈福與梅枝餅半日遊",
+                desc: "祇園站搭地鐵至天神站，轉西鐵太宰府線。參拜神殿，朝聖隈研吾設計的特色星巴克（08:00 - 20:00），品嚐梅枝餅。本殿開門時間：06:00 - 19:00。地址：福岡県太宰府市宰府 4-7-1。"
+            },
+            {
+                time: "13:00-18:30",
+                title: "天神地下街 + 博多運河城 最後瘋狂大血拼",
+                desc: "天神地下街大採購，下午移動至博多運河城繼續血拼。可逛中洲川端商圈、百貨公司與電器量販店，進行最後衝刺採購。"
+            },
+            {
+                time: "18:30 以後",
+                title: "博多華味鳥 水炊雞肉鍋晚餐",
+                desc: "享用乳白色濃郁湯底的博多名物「水炊鍋」，完美療癒雙腿，慶祝美好旅程最後一夜！"
+            }
+        ],
+        lodging: "Rakuten STAY 博多祇園（連住第二晚）"
+    },
+    {
+        day: 8,
+        date: "6/23 (二)",
+        title: "平安返台",
+        route: "博多 > 福岡機場 > 台北桃園",
+        events: [
+            {
+                time: "07:30-08:00",
+                title: "自助平板退房 > 地鐵前往機場",
+                desc: "祇園站搭地鐵空港線至國內線（約 6 分鐘），轉搭免費穿梭巴士直達國際線航廈（約 12 分鐘）。"
+            },
+            {
+                time: "08:30",
+                title: "虎航 IT241 辦理登機（10:10 關櫃！）",
+                desc: "請務必於 08:30 前抵達國際線虎航櫃台排隊辦理託運，10:10 準時關櫃。最後在免稅店掃貨後登機。"
+            },
+            {
+                time: "10:55 起飛",
+                title: "虎航 IT241 起飛返台",
+                desc: "福岡機場 (FUK) 起飛，12:25 順利降落台北桃園國際機場 (TPE)。帶著滿滿的九州回憶平安返家！"
+            }
+        ],
+        lodging: "溫暖的家"
+    }
+];
+
+var currentDay = 1;
+var votes = {};
+
+function initApp() {
+    var tabContainer = document.getElementById('tabContainer');
+    var cardContainer = document.getElementById('cardContainer');
+
+    itinerary.forEach(function(item, index) {
+        var hasDecision = item.decisions && item.decisions.length > 0;
+        var tab = document.createElement('button');
+        tab.className = 'tab-btn' + (index === 0 ? ' active' : '') + (hasDecision ? ' has-choice' : '');
+        tab.textContent = 'D' + item.day;
+        tab.id = 'tab-d' + item.day;
+        (function(d) { tab.onclick = function() { switchDay(d); }; })(item.day);
+        tabContainer.appendChild(tab);
+
+        var card = document.createElement('div');
+        card.className = 'card' + (index === 0 ? ' active' : '');
+        card.id = 'card-d' + item.day;
+
+        var eventsHtml = '<div class="timeline">';
+        item.events.forEach(function(evt) {
+            eventsHtml += '<div class="timeline-item"><div class="time-marker"><div class="marker-dot"></div><div class="marker-line"></div></div><div class="time-content">';
+            eventsHtml += '<div class="time-tag">' + evt.time + '</div>';
+            eventsHtml += '<div class="time-title">' + evt.title + '</div>';
+            eventsHtml += '<div class="time-desc">' + evt.desc + '</div>';
+            eventsHtml += '</div></div>';
+        });
+        eventsHtml += '</div>';
+
+        var decisionsHtml = '';
+        if (hasDecision) {
+            item.decisions.forEach(function(dec) {
+                decisionsHtml += '<div class="decision-section"><div class="decision-header"><span class="decision-badge">討論抉擇</span><h3>' + dec.title + '</h3></div><div class="options-list">';
+                dec.options.forEach(function(opt) {
+                    var metaHtml = '<div class="option-meta">';
+                    opt.meta.forEach(function(m) { metaHtml += '<span class="meta-item">' + m + '</span>'; });
+                    metaHtml += '</div>';
+                    var detailsHtml = '<div class="option-details-list">';
+                    opt.details.forEach(function(det) {
+                        detailsHtml += '<div class="detail-item"><span class="detail-label">&#9670; ' + det.label + '：</span><span class="detail-val">' + det.val + '</span></div>';
+                    });
+                    detailsHtml += '</div>';
+                    (function(dayNum, optId, decId) {
+                        decisionsHtml += '<div class="option-card" id="' + optId + '" onclick="selectOption(\'' + dayNum + '\',\'' + optId + '\',\'' + decId + '\')">';
+                    })(item.day, opt.id, dec.id);
+                    decisionsHtml += '<div class="option-title-row"><span class="option-name">' + opt.name + '</span><div class="vote-indicator"></div></div>';
+                    decisionsHtml += '<div class="option-desc">' + opt.desc + '</div>';
+                    decisionsHtml += detailsHtml;
+                    decisionsHtml += metaHtml;
+                    decisionsHtml += '</div>';
+                });
+                decisionsHtml += '</div></div>';
+            });
+        }
+
+        var lodgingHtml = '<div class="info-box"><div class="info-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div><div class="info-details"><span class="info-label">本日住宿地點</span><span class="info-name">' + item.lodging + '</span></div></div>';
+
+        var headerHtml = '<div class="card-header">' +
+            '<div class="card-day-row">' +
+            '<span class="card-day-label">D' + item.day + '</span>' +
+            '<span class="card-date-label">' + item.date + '</span>' +
+            '</div>' +
+            '<span class="card-title">' + item.title + '</span>' +
+            '<span class="card-badge">' + item.route + '</span>' +
+            '</div>';
+
+        card.innerHTML = headerHtml + eventsHtml + decisionsHtml + lodgingHtml;
+        cardContainer.appendChild(card);
+    });
+
+    loadSavedChoices();
+}
+
+function switchDay(dayNum) {
+    document.querySelectorAll('.tab-btn').forEach(function(btn) { btn.classList.remove('active'); });
+    document.querySelectorAll('.card').forEach(function(c) { c.classList.remove('active'); });
+    var tab = document.getElementById('tab-d' + dayNum);
+    var card = document.getElementById('card-d' + dayNum);
+    if (tab) { tab.classList.add('active'); tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }
+    if (card) card.classList.add('active');
+    currentDay = dayNum;
+}
+
+function selectOption(dayNum, optionId, decisionId) {
+    var dayData = null;
+    for (var i = 0; i < itinerary.length; i++) {
+        if (itinerary[i].day == dayNum) { dayData = itinerary[i]; break; }
+    }
+    if (!dayData || !dayData.decisions) return;
+    var dec = null;
+    for (var j = 0; j < dayData.decisions.length; j++) {
+        if (dayData.decisions[j].id == decisionId) { dec = dayData.decisions[j]; break; }
+    }
+    if (!dec) return;
+    dec.options.forEach(function(opt) {
+        var el = document.getElementById(opt.id);
+        if (el) el.classList.remove('selected');
+    });
+    var clicked = document.getElementById(optionId);
+    if (clicked) clicked.classList.add('selected');
+    votes[decisionId] = optionId;
+    try { localStorage.setItem('kyushu_votes', JSON.stringify(votes)); } catch(e) {}
+}
+
+function loadSavedChoices() {
+    try {
+        var saved = localStorage.getItem('kyushu_votes');
+        if (!saved) return;
+        var parsed = JSON.parse(saved);
+        Object.keys(parsed).forEach(function(decisionId) {
+            for (var i = 0; i < itinerary.length; i++) {
+                var item = itinerary[i];
+                if (!item.decisions) continue;
+                for (var j = 0; j < item.decisions.length; j++) {
+                    if (item.decisions[j].id == decisionId) {
+                        selectOption(item.day, parsed[decisionId], decisionId);
+                        break;
+                    }
+                }
+            }
+        });
+    } catch(e) {}
+}
+
+function nextDay() {
+    if (currentDay < itinerary.length) { switchDay(currentDay + 1); } else { switchDay(1); }
+}
+
+function prevDay() {
+    if (currentDay > 1) { switchDay(currentDay - 1); } else { switchDay(itinerary.length); }
+}
+
+window.onload = initApp;
+</script>
+</body>
+</html>
